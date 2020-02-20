@@ -1,10 +1,11 @@
-package com.mistershorr.databases;
+package com.per6.databases;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,6 +16,8 @@ import com.backendless.Backendless;
 import com.backendless.BackendlessUser;
 import com.backendless.async.callback.AsyncCallback;
 import com.backendless.exceptions.BackendlessFault;
+
+import java.util.List;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -33,7 +36,23 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         // initialize backendless
-        Backendless.initApp(this, Credentials.APP_ID, Credentials.API_KEY);
+        Backendless.initApp(this, com.per6.databases.Credentials.APP_ID, com.per6.databases.Credentials.API_KEY);
+
+        Backendless.Data.of(Friend.class).find( new AsyncCallback<List<Friend>>(){
+            @Override
+            public void handleResponse(List<Friend> foundFriends )
+            {
+                Log.d(TAG, "handleResponse: " + foundFriends.get(0).toString());
+                // TODO make a custom adapter to load all friends into list and display said list
+                //TODO make Friend parcelable + when a friend is clicked, opens detail activity and loads the info
+            }
+            @Override
+            public void handleFault( BackendlessFault fault )
+            {
+                Toast.makeText(LoginActivity.this, fault.getDetail(), Toast.LENGTH_SHORT).show();
+                // an error has occurred, the error code can be retrieved with fault.getCode()
+            }
+        });
 
         wireWidgets();
         setListeners();
@@ -52,7 +71,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // TODO replace create account startActivity with startAcitivtyForResult
-                Intent createAccountIntent = new Intent(LoginActivity.this, RegistrationActivity.class);
+                Intent createAccountIntent = new Intent(LoginActivity.this, com.per6.databases.RegistrationActivity.class);
                 createAccountIntent.putExtra(EXTRA_USERNAME, editTextUsername.getText().toString());
                 // startActivity(createAccountIntent);
                 startActivityForResult(createAccountIntent, REQUEST_CREATE_ACCOUNT);
@@ -71,8 +90,8 @@ public class LoginActivity extends AppCompatActivity {
             {
                 // use the intent from the parameter to extract the username and password
                 // and prefill them into the edittext fields here
-                editTextUsername.setText(data.getStringExtra(RegistrationActivity.EXTRA_USERNAME));
-                editTextPassword.setText(data.getStringExtra(RegistrationActivity.EXTRA_PASSWORD));
+                editTextUsername.setText(data.getStringExtra(com.per6.databases.RegistrationActivity.EXTRA_USERNAME));
+                editTextPassword.setText(data.getStringExtra(com.per6.databases.RegistrationActivity.EXTRA_PASSWORD));
             }
         }
     }
@@ -89,6 +108,9 @@ public class LoginActivity extends AppCompatActivity {
                 public void handleResponse(BackendlessUser user) {
                     Toast.makeText(LoginActivity.this,
                             "Welcome " + user.getProperty("username"), Toast.LENGTH_SHORT).show();
+                    Intent loggedInIntent = new Intent(LoginActivity.this, FriendListActivity.class);
+                    startActivity(loggedInIntent);
+                    finish(); //doesn't go back to login page again
                 }
 
                 public void handleFault(BackendlessFault fault) {

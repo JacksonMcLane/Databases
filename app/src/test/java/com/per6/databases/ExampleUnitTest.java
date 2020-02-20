@@ -1,4 +1,4 @@
-package com.mistershorr.databases;
+package com.per6.databases;
 
 import org.junit.Test;
 
