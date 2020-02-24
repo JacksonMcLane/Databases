@@ -34,25 +34,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
         // initialize backendless
-        Backendless.initApp(this, com.per6.databases.Credentials.APP_ID, com.per6.databases.Credentials.API_KEY);
-
-        Backendless.Data.of(Friend.class).find( new AsyncCallback<List<Friend>>(){
-            @Override
-            public void handleResponse(List<Friend> foundFriends )
-            {
-                Log.d(TAG, "handleResponse: " + foundFriends.get(0).toString());
-                // TODO make a custom adapter to load all friends into list and display said list
-                //TODO make Friend parcelable + when a friend is clicked, opens detail activity and loads the info
-            }
-            @Override
-            public void handleFault( BackendlessFault fault )
-            {
-                Toast.makeText(LoginActivity.this, fault.getDetail(), Toast.LENGTH_SHORT).show();
-                // an error has occurred, the error code can be retrieved with fault.getCode()
-            }
-        });
 
         wireWidgets();
         setListeners();

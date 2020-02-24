@@ -1,6 +1,9 @@
 package com.per6.databases;
 
-public class Friend {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Friend implements Parcelable {
     private int clumsiness;
     private double gymFrequency;
     private boolean isAwesome;
@@ -61,4 +64,41 @@ public class Friend {
     public void setTrustworthiness(int trustworthiness) {
         this.trustworthiness = trustworthiness;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeInt(clumsiness);
+        parcel.writeDouble(gymFrequency);
+        parcel.writeByte((byte) (isAwesome ? 1 : 0));
+        parcel.writeDouble(moneyOwed);
+        parcel.writeString(name);
+        parcel.writeInt(trustworthiness);
+    }
+
+    protected Friend(Parcel in) {
+        clumsiness = in.readInt();
+        gymFrequency = in.readDouble();
+        isAwesome = in.readByte() != 0;
+        moneyOwed = in.readDouble();
+        name = in.readString();
+        trustworthiness = in.readInt();
+    }
+
+    public static final Creator<Friend> CREATOR = new Creator<Friend>() {
+        @Override
+        public Friend createFromParcel(Parcel in) {
+            return new Friend(in);
+        }
+
+        @Override
+        public Friend[] newArray(int size) {
+            return new Friend[size];
+        }
+    };
+
 }

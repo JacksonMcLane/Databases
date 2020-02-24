@@ -7,4 +7,6 @@
     <string name="confirm_password">Confirm Password</string>
     <string name="email">Email</string>
     <string name="name">Name</string>
+    <string name="awesome_switch">Awesome</string>
+    <string name="clumsiness">Clumsiness</string>
 </resources>
