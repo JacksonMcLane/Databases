@@ -9,4 +9,8 @@
     <string name="name">Name</string>
     <string name="awesome_switch">Awesome</string>
     <string name="clumsiness">Clumsiness</string>
+    <string name="gym_frequency">Gym Frequency</string>
+    <string name="trustworthiness">Trustworthiness</string>
+    <string name="money_owed">Money Owed</string>
+    <string name="update">Update</string>
 </resources>

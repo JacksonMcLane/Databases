@@ -10,11 +10,30 @@ public class Friend implements Parcelable {
     private double moneyOwed;
     private String name;
     private int trustworthiness;
+    //backendless specific
+    private String objectId;
+    private String ownerId;
 
     public Friend(){}
 
     public String toString(){
         return name + " " + clumsiness;
+    }
+
+    public String getObjectId() {
+        return objectId;
+    }
+
+    public void setObjectId(String objectId) {
+        this.objectId = objectId;
+    }
+
+    public String getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(String ownerId) {
+        this.ownerId = ownerId;
     }
 
     public int getClumsiness() {
@@ -71,28 +90,32 @@ public class Friend implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeInt(clumsiness);
-        parcel.writeDouble(gymFrequency);
-        parcel.writeByte((byte) (isAwesome ? 1 : 0));
-        parcel.writeDouble(moneyOwed);
-        parcel.writeString(name);
-        parcel.writeInt(trustworthiness);
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.clumsiness);
+        dest.writeDouble(this.gymFrequency);
+        dest.writeByte(this.isAwesome ? (byte) 1 : (byte) 0);
+        dest.writeDouble(this.moneyOwed);
+        dest.writeString(this.name);
+        dest.writeInt(this.trustworthiness);
+        dest.writeString(this.objectId);
+        dest.writeString(this.ownerId);
     }
 
     protected Friend(Parcel in) {
-        clumsiness = in.readInt();
-        gymFrequency = in.readDouble();
-        isAwesome = in.readByte() != 0;
-        moneyOwed = in.readDouble();
-        name = in.readString();
-        trustworthiness = in.readInt();
+        this.clumsiness = in.readInt();
+        this.gymFrequency = in.readDouble();
+        this.isAwesome = in.readByte() != 0;
+        this.moneyOwed = in.readDouble();
+        this.name = in.readString();
+        this.trustworthiness = in.readInt();
+        this.objectId = in.readString();
+        this.ownerId = in.readString();
     }
 
     public static final Creator<Friend> CREATOR = new Creator<Friend>() {
         @Override
-        public Friend createFromParcel(Parcel in) {
-            return new Friend(in);
+        public Friend createFromParcel(Parcel source) {
+            return new Friend(source);
         }
 
         @Override
@@ -100,5 +123,4 @@ public class Friend implements Parcelable {
             return new Friend[size];
         }
     };
-
 }
