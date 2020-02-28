@@ -13,4 +13,5 @@
     <string name="trustworthiness">Trustworthiness</string>
     <string name="money_owed">Money Owed</string>
     <string name="update">Update</string>
+    <string name="create">Create</string>
 </resources>

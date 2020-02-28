@@ -1,5 +1,6 @@
 package com.per6.databases;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
@@ -20,6 +21,7 @@ import com.backendless.UserService;
 import com.backendless.async.callback.AsyncCallback;
 import com.backendless.exceptions.BackendlessFault;
 import com.backendless.persistence.DataQueryBuilder;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
@@ -32,13 +34,17 @@ public class FriendListActivity extends AppCompatActivity {
     private TextView textViewName;
     private TextView textViewClumsiness;
     private TextView textViewMoneyOwed;
+    private FloatingActionButton floatingActionButtonNewFriend;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friend_list);
-
         wireWidgets();
+        loadDataFromBackendless();
+    }
+
+    public void loadDataFromBackendless(){
         Backendless.initApp(this, com.per6.databases.Credentials.APP_ID, com.per6.databases.Credentials.API_KEY);
         //search only for Friends with ownerIds that match the user's objectId
         String userId = Backendless.UserService.CurrentUser().getObjectId();
@@ -62,8 +68,16 @@ public class FriendListActivity extends AppCompatActivity {
                         startActivity(detailIntent);
                     }
                 });
-                
-                //TODO make Friend parcelable + when a friend is clicked, opens detail activity and loads the info
+
+                floatingActionButtonNewFriend.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent newFriendIntent = new Intent(FriendListActivity.this, FriendDetailActivity.class);
+                        startActivity(newFriendIntent);
+                    }
+                });
+
+
             }
             @Override
             public void handleFault( BackendlessFault fault )
@@ -72,7 +86,14 @@ public class FriendListActivity extends AppCompatActivity {
                 // an error has occurred, the error code can be retrieved with fault.getCode()
             }
         });
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if(friendAdapter != null) {
+            loadDataFromBackendless();
+        }
     }
 
     private void wireWidgets() {
@@ -80,7 +101,7 @@ public class FriendListActivity extends AppCompatActivity {
         textViewName = findViewById(R.id.textView_item_friend_name);
         textViewClumsiness = findViewById(R.id.textView_item_friend_clumsiness);
         textViewMoneyOwed = findViewById(R.id.textView_item_friend_money_owed);
-
+        floatingActionButtonNewFriend = findViewById(R.id.floatingActionButton_list_add);
     }
 
 

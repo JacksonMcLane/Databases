@@ -4,7 +4,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.Adapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RatingBar;
@@ -34,17 +36,47 @@ public class FriendDetailActivity extends AppCompatActivity {
         wireWidgets();
         Intent foundIntent = getIntent();
         foundFriend = foundIntent.getParcelableExtra(FriendListActivity.EXTRA_FRIEND);
-        editTextName.setText(foundFriend.getName());
-        seekBarClumsiness.setProgress(foundFriend.getClumsiness());
-        switchAwesome.setChecked(foundFriend.isAwesome());
-        seekBarGymFrequency.setProgress((int)(foundFriend.getGymFrequency()*2));
-        ratingBarTrustworthiness.setProgress(foundFriend.getTrustworthiness());
-        editTextMoneyOwed.setText(String.valueOf(foundFriend.getMoneyOwed()));
-        setButtonListener();
-
-
+        if (foundFriend == null) {
+            buttonUpdate.setText(R.string.create);
+            newFriend();
+        }
+        else {
+            editTextName.setText(foundFriend.getName());
+            seekBarClumsiness.setProgress(foundFriend.getClumsiness());
+            switchAwesome.setChecked(foundFriend.isAwesome());
+            seekBarGymFrequency.setProgress((int) (foundFriend.getGymFrequency() * 2));
+            ratingBarTrustworthiness.setProgress(foundFriend.getTrustworthiness());
+            editTextMoneyOwed.setText(String.valueOf(foundFriend.getMoneyOwed()));
+            setButtonListener();
+        }
 
     }
+
+    private void newFriend() {
+
+        buttonUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                foundFriend = new Friend();
+                Backendless.Persistence.save(foundFriend, new AsyncCallback<Friend>() {
+                    @Override
+                    public void handleResponse(Friend response) {
+                        foundFriend.setName(String.valueOf(editTextName.getText()));
+                        foundFriend.setClumsiness(seekBarClumsiness.getProgress());
+                        foundFriend.setAwesome(switchAwesome.isChecked());
+                        foundFriend.setGymFrequency((seekBarGymFrequency.getProgress()/2.0));
+                        foundFriend.setTrustworthiness(ratingBarTrustworthiness.getProgress());
+                        foundFriend.setMoneyOwed(Double.valueOf(String.valueOf(editTextMoneyOwed.getText())));
+                    }
+                    @Override
+                    public void handleFault(BackendlessFault fault) {
+
+                    }
+                });
+            }
+        });
+    }
+
 
     private void setButtonListener() {
         buttonUpdate.setOnClickListener(new View.OnClickListener() {
@@ -54,6 +86,12 @@ public class FriendDetailActivity extends AppCompatActivity {
                     @Override
                     public void handleResponse(Friend response) {
                         foundFriend.setName(String.valueOf(editTextName.getText()));
+                        foundFriend.setClumsiness(seekBarClumsiness.getProgress());
+                        foundFriend.setAwesome(switchAwesome.isChecked());
+                        foundFriend.setGymFrequency((seekBarGymFrequency.getProgress()/2.0));
+                        foundFriend.setTrustworthiness(ratingBarTrustworthiness.getProgress());
+                        foundFriend.setMoneyOwed(Double.valueOf(String.valueOf(editTextMoneyOwed.getText())));
+
                     }
 
                     @Override
