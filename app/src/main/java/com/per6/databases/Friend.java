@@ -52,11 +52,11 @@ public class Friend implements Parcelable {
         this.gymFrequency = gymFrequency;
     }
 
-    public boolean isAwesome() {
+    public boolean getIsAwesome() {
         return isAwesome;
     }
 
-    public void setAwesome(boolean awesome) {
+    public void setIsAwesome(boolean awesome) {
         isAwesome = awesome;
     }
 
