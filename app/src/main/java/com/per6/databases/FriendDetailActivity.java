@@ -4,17 +4,15 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.Adapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RatingBar;
 import android.widget.SeekBar;
 import android.widget.Switch;
+import android.widget.Toast;
 
 import com.backendless.Backendless;
-import com.backendless.Persistence;
 import com.backendless.async.callback.AsyncCallback;
 import com.backendless.exceptions.BackendlessFault;
 
@@ -43,13 +41,14 @@ public class FriendDetailActivity extends AppCompatActivity {
         else {
             editTextName.setText(foundFriend.getName());
             seekBarClumsiness.setProgress(foundFriend.getClumsiness());
-            switchAwesome.setChecked(foundFriend.getIsAwesome());
+            switchAwesome.setChecked(foundFriend.getAwesome());
             seekBarGymFrequency.setProgress((int)(foundFriend.getGymFrequency() * 2));
             ratingBarTrustworthiness.setProgress(foundFriend.getTrustworthiness());
             editTextMoneyOwed.setText(String.valueOf(foundFriend.getMoneyOwed()));
+            setButtonListener();
 
         }
-        setButtonListener();
+
 
     }
 
@@ -57,17 +56,18 @@ public class FriendDetailActivity extends AppCompatActivity {
         buttonUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                foundFriend = new Friend();
+                foundFriend.setOwnerId(Backendless.UserService.CurrentUser().getUserId());
+                foundFriend.setName(String.valueOf(editTextName.getText()));
+                foundFriend.setClumsiness(seekBarClumsiness.getProgress());
+                foundFriend.setAwesome(switchAwesome.isChecked());
+                foundFriend.setGymFrequency((seekBarGymFrequency.getProgress()/2.0));
+                foundFriend.setTrustworthiness(ratingBarTrustworthiness.getProgress());
+                foundFriend.setMoneyOwed(Double.valueOf(String.valueOf(editTextMoneyOwed.getText())));
                 Backendless.Persistence.save(foundFriend, new AsyncCallback<Friend>() {
                     @Override
                     public void handleResponse(Friend response) {
-                        foundFriend = new Friend();
-                        foundFriend.setOwnerId(Backendless.UserService.CurrentUser().getUserId());
-                        foundFriend.setName(String.valueOf(editTextName.getText()));
-                        foundFriend.setClumsiness(seekBarClumsiness.getProgress());
-                        foundFriend.setIsAwesome(switchAwesome.isChecked());
-                        foundFriend.setGymFrequency((seekBarGymFrequency.getProgress()/2.0));
-                        foundFriend.setTrustworthiness(ratingBarTrustworthiness.getProgress());
-                        foundFriend.setMoneyOwed(Double.valueOf(String.valueOf(editTextMoneyOwed.getText())));
+                        Toast.makeText(FriendDetailActivity.this, "Successfully Made Friend", Toast.LENGTH_SHORT).show();
                     }
                     @Override
                     public void handleFault(BackendlessFault fault) {
@@ -83,21 +83,19 @@ public class FriendDetailActivity extends AppCompatActivity {
         buttonUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                foundFriend.setName(String.valueOf(editTextName.getText()));
+                foundFriend.setClumsiness(seekBarClumsiness.getProgress());
+                foundFriend.setAwesome(switchAwesome.isChecked());
+                foundFriend.setGymFrequency((seekBarGymFrequency.getProgress()/2.0));
+                foundFriend.setTrustworthiness(ratingBarTrustworthiness.getProgress());
+                foundFriend.setMoneyOwed(Double.valueOf(String.valueOf(editTextMoneyOwed.getText())));
                 Backendless.Persistence.save(foundFriend, new AsyncCallback<Friend>() {
                     @Override
                     public void handleResponse(Friend response) {
-                        foundFriend.setName(String.valueOf(editTextName.getText()));
-                        foundFriend.setClumsiness(seekBarClumsiness.getProgress());
-                        foundFriend.setIsAwesome(switchAwesome.isChecked());
-                        foundFriend.setGymFrequency((seekBarGymFrequency.getProgress()/2.0));
-                        foundFriend.setTrustworthiness(ratingBarTrustworthiness.getProgress());
-                        foundFriend.setMoneyOwed(Double.valueOf(String.valueOf(editTextMoneyOwed.getText())));
-
+                        Toast.makeText(FriendDetailActivity.this, "Successfully Updated Friend", Toast.LENGTH_SHORT).show();
                     }
-
                     @Override
                     public void handleFault(BackendlessFault fault) {
-
                     }
                 });
             }
