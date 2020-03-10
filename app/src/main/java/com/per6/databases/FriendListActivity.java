@@ -1,5 +1,6 @@
 package com.per6.databases;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -10,6 +11,7 @@ import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -38,21 +40,49 @@ public class FriendListActivity extends AppCompatActivity {
     private TextView textViewMoneyOwed;
     private FloatingActionButton floatingActionButtonNewFriend;
 
-//    @Override
-//    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-//        super.onCreateContextMenu(menu, v, menuInfo);
-//        MenuInflater inflater = getMenuInflater();
-//        inflater.inflate;
-//    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friend_list);
         wireWidgets();
         loadDataFromBackendless();
+        registerForContextMenu(listView);
 
+    }
 
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.context_menu, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        switch (item.getItemId()) {
+            case R.id.menu_item_context_delete:
+                deleteFriend(info.position);
+                return true;
+
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
+
+    private void deleteFriend(int position) {
+        Backendless.Persistence.of(Friend.class).remove((Friend)listView.getAdapter().getItem(position), new AsyncCallback<Long>() {
+            @Override
+            public void handleResponse(Long response) {
+                friendAdapter.notifyDataSetChanged();
+                Toast.makeText(FriendListActivity.this, "Deleted Friend", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void handleFault(BackendlessFault fault) {
+
+            }
+        });
     }
 
     public void loadDataFromBackendless(){
