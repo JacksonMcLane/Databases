@@ -1,15 +1,13 @@
 package com.per6.databases;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,12 +19,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.backendless.Backendless;
-import com.backendless.UserService;
 import com.backendless.async.callback.AsyncCallback;
 import com.backendless.exceptions.BackendlessFault;
 import com.backendless.persistence.DataQueryBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class FriendListActivity extends AppCompatActivity {
@@ -39,12 +38,19 @@ public class FriendListActivity extends AppCompatActivity {
     private TextView textViewClumsiness;
     private TextView textViewMoneyOwed;
     private FloatingActionButton floatingActionButtonNewFriend;
+    private Comparator<Friend> comparator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friend_list);
         wireWidgets();
+        comparator = new Comparator<Friend>() {
+            @Override
+            public int compare(Friend friend, Friend t1) {
+                return friend.getName().compareTo(t1.getName());
+            }
+        };
         loadDataFromBackendless();
         registerForContextMenu(listView);
 
@@ -60,22 +66,58 @@ public class FriendListActivity extends AppCompatActivity {
     @Override
     public boolean onContextItemSelected(@NonNull MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        switch (item.getItemId()) {
-            case R.id.menu_item_context_delete:
-                deleteFriend(info.position);
-                return true;
-
-            default:
-                return super.onContextItemSelected(item);
+        if(item.getItemId() == R.id.menu_item_context_delete) {
+            deleteFriend(info.position);
+            return true;
         }
+        else{
+            return super.onContextItemSelected(item);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.options_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_item_options_sort_by_name:
+                sortAlphabetically();
+                friendAdapter.notifyDataSetChanged();
+                return true;
+            case R.id.menu_item_options_sort_by_money_owed:
+                sortByName();
+                friendAdapter.notifyDataSetChanged();
+                return true;
+            case R.id.menu_item_options_log_out:
+                logoutUser();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void sortByName() {
+        Collections.sort(friendAdapter.getFriendsList());
+        friendAdapter.notifyDataSetChanged();
+    }
+
+    private void sortAlphabetically() {
+        Collections.sort(friendAdapter.getFriendsList(), comparator);
+        friendAdapter.notifyDataSetChanged();
     }
 
     private void deleteFriend(int position) {
         Backendless.Persistence.of(Friend.class).remove((Friend)listView.getAdapter().getItem(position), new AsyncCallback<Long>() {
             @Override
             public void handleResponse(Long response) {
-                friendAdapter.notifyDataSetChanged();
                 Toast.makeText(FriendListActivity.this, "Deleted Friend", Toast.LENGTH_SHORT).show();
+                friendAdapter.notifyDataSetChanged();
+                loadDataFromBackendless();
             }
 
             @Override
@@ -83,6 +125,22 @@ public class FriendListActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void logoutUser() {
+        Intent logoutIntent = new Intent(FriendListActivity.this, LoginActivity.class);
+        Backendless.UserService.logout(new AsyncCallback<Void>() {
+            @Override
+            public void handleResponse(Void response) {
+
+            }
+
+            @Override
+            public void handleFault(BackendlessFault fault) {
+
+            }
+        });
+        startActivity(logoutIntent);
     }
 
     public void loadDataFromBackendless(){
@@ -153,6 +211,14 @@ public class FriendListActivity extends AppCompatActivity {
 
         public FriendAdapter(List<Friend> friendsList) {
             super(FriendListActivity.this, -1, friendsList);
+            this.friendsList = friendsList;
+        }
+
+        public List<Friend> getFriendsList() {
+            return friendsList;
+        }
+
+        public void setFriendsList(List<Friend> friendsList) {
             this.friendsList = friendsList;
         }
 

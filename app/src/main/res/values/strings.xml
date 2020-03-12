@@ -15,4 +15,7 @@
     <string name="update">Update</string>
     <string name="create">Create</string>
     <string name="delete">Delete</string>
+    <string name="sort_by_name">Sort By Name</string>
+    <string name="sort_by_money_owed">Sort By Money Owed</string>
+    <string name="log_out">Log Out</string>
 </resources>

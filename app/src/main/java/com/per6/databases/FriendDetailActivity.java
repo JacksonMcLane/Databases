@@ -1,9 +1,13 @@
 package com.per6.databases;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -48,8 +52,40 @@ public class FriendDetailActivity extends AppCompatActivity {
             setButtonListener();
 
         }
+    }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.options_menu_detail, menu);
+        return true;
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId() == R.id.menu_item_detail_options_log_out){
+            logoutUser();
+            return true;
+        }
+        else{
+            return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void logoutUser() {
+        Intent logoutIntent = new Intent(FriendDetailActivity.this, LoginActivity.class);
+        Backendless.UserService.logout(new AsyncCallback<Void>() {
+            @Override
+            public void handleResponse(Void response) {
+
+            }
+
+            @Override
+            public void handleFault(BackendlessFault fault) {
+
+            }
+        });
+        startActivity(logoutIntent);
     }
 
     private void newFriend() {
@@ -68,6 +104,7 @@ public class FriendDetailActivity extends AppCompatActivity {
                     @Override
                     public void handleResponse(Friend response) {
                         Toast.makeText(FriendDetailActivity.this, "Successfully Made Friend", Toast.LENGTH_SHORT).show();
+                        finish();
                     }
                     @Override
                     public void handleFault(BackendlessFault fault) {

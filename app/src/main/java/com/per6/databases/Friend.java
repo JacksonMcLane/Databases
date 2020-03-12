@@ -3,7 +3,7 @@ package com.per6.databases;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class Friend implements Parcelable {
+public class Friend implements Parcelable, Comparable<Friend> {
     private int clumsiness;
     private double gymFrequency;
     private boolean awesome;
@@ -82,6 +82,11 @@ public class Friend implements Parcelable {
 
     public void setTrustworthiness(int trustworthiness) {
         this.trustworthiness = trustworthiness;
+    }
+
+    @Override
+    public int compareTo(Friend friend) {
+        return (int)(this.getMoneyOwed() - friend.getMoneyOwed());
     }
 
     @Override
